@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS quotes (
     text TEXT NOT NULL,
     author VARCHAR(128) NOT NULL,
     tags JSON, -- e.g. ["motivation", "funny"]
+    safe BOOLEAN NOT NULL DEFAULT TRUE, -- family-friendly safety flag
+    moderation_reviewed BOOLEAN NOT NULL DEFAULT FALSE, -- for moderation workflow
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

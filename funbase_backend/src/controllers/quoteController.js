@@ -26,7 +26,7 @@ function parseTags(tags) {
 exports.getRandomQuote = async (req, res) => {
   const { tag, author } = req.query;
   let sql = "SELECT * FROM quotes";
-  const where = [];
+  const where = ["safe=1"];
   const params = [];
   if (tag) {
     where.push("JSON_CONTAINS(tags, '\"" + tag + "\"')");
@@ -57,7 +57,7 @@ exports.getRandomQuote = async (req, res) => {
 exports.getQuotes = async (req, res) => {
   const { tag, author, search, limit = 12 } = req.query;
   let sql = "SELECT * FROM quotes";
-  const where = [];
+  const where = ["safe=1"];
   const params = [];
   if (tag) {
     where.push("JSON_CONTAINS(tags, '\"" + tag + "\"')");
@@ -98,8 +98,8 @@ exports.likeQuote = async (req, res) => {
     // Validate user and quote exist
     const [[user]] = await pool.query("SELECT id FROM users WHERE id=?", [user_id]);
     if (!user) return res.status(404).json({ error: "User not found" });
-    const [[quote]] = await pool.query("SELECT id FROM quotes WHERE id=?", [id]);
-    if (!quote) return res.status(404).json({ error: "Quote not found" });
+    const [[quote]] = await pool.query("SELECT id FROM quotes WHERE id=? AND safe=1", [id]);
+    if (!quote) return res.status(404).json({ error: "Quote not found or not safe" });
     // Add favorite if not already
     await pool.query(
       "INSERT IGNORE INTO favorites (user_id, item_type, item_id) VALUES (?, 'quote', ?)",
@@ -147,7 +147,7 @@ exports.getUserSavedQuotes = async (req, res) => {
     const [rows] = await pool.query(
       `SELECT q.* FROM favorites f
        JOIN quotes q ON f.item_id = q.id
-       WHERE f.user_id=? AND f.item_type='quote'
+       WHERE f.user_id=? AND f.item_type='quote' AND q.safe=1
        ORDER BY f.created_at DESC`, [user_id]
     );
     rows.forEach(row => row.tags = parseTags(row.tags));
@@ -167,6 +167,16 @@ exports.submitQuote = async (req, res) => {
   const { text, author, tags } = req.body;
   if (!text || !author)
     return res.status(400).json({ error: "Both text and author are required" });
+
+  // SIMPLE BLOCKLIST (stub): prevent forbidden words (could be extended)
+  const BLOCKLIST = ["badword", "offensive", "inappropriate"];
+  const lowered = text.toLowerCase();
+  for (const word of BLOCKLIST) {
+    if (lowered.includes(word)) {
+      return res.status(400).json({ error: "Your quote contains inappropriate language and cannot be submitted." });
+    }
+  }
+
   let tagsJson = null;
   if (tags) {
     if (Array.isArray(tags)) tagsJson = JSON.stringify(tags);
@@ -178,8 +188,9 @@ exports.submitQuote = async (req, res) => {
   }
   try {
     const pool = getPool();
+    // Quotes are marked safe=false and moderation_reviewed=false by default until approved
     const [result] = await pool.query(
-      "INSERT INTO quotes (text, author, tags) VALUES (?, ?, ?)",
+      "INSERT INTO quotes (text, author, tags, safe, moderation_reviewed) VALUES (?, ?, ?, FALSE, FALSE)",
       [text, author, tagsJson]
     );
     res.status(201).json({ id: result.insertId, text, author, tags: parseTags(tagsJson) });
@@ -200,7 +211,7 @@ exports.getQuotesByAuthor = async (req, res) => {
   try {
     const pool = getPool();
     const [rows] = await pool.query(
-      "SELECT * FROM quotes WHERE author LIKE ? ORDER BY created_at DESC",
+      "SELECT * FROM quotes WHERE author LIKE ? AND safe=1 ORDER BY created_at DESC",
       [`%${author}%`]
     );
     rows.forEach(row => row.tags = parseTags(row.tags));
