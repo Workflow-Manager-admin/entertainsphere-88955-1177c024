@@ -17,7 +17,7 @@ exports.getFunEventsByDate = async (req, res) => {
     if (!date) {
       return res.status(400).json({ error: "Query parameter 'date' is required in format YYYY-MM-DD." });
     }
-    const [rows] = await db.query(
+    const [rows] = await db.getPool().query(
       'SELECT * FROM fun_events WHERE event_date = ?', [date]
     );
     return res.json(rows);
@@ -34,7 +34,7 @@ exports.getRandomFunEvent = async (req, res) => {
    * Returns: a single fun event object.
    */
   try {
-    const [rows] = await db.query(
+    const [rows] = await db.getPool().query(
       'SELECT * FROM fun_events ORDER BY RAND() LIMIT 1'
     );
     if (rows.length === 0) {
@@ -55,7 +55,7 @@ exports.getTodayFunEvents = async (req, res) => {
    */
   try {
     const today = moment().format('YYYY-MM-DD');
-    const [rows] = await db.query(
+    const [rows] = await db.getPool().query(
       'SELECT * FROM fun_events WHERE event_date = ?', [today]
     );
     return res.json(rows);
@@ -77,7 +77,7 @@ exports.createFunEvent = async (req, res) => {
     if (!event_date || !title || !type || !content) {
       return res.status(400).json({ error: 'event_date, title, type, and content fields are required.' });
     }
-    const [result] = await db.query(
+    const [result] = await db.getPool().query(
       'INSERT INTO fun_events (event_date, title, type, content, url, metadata) VALUES (?, ?, ?, ?, ?, ?)',
       [
         event_date,
@@ -89,7 +89,7 @@ exports.createFunEvent = async (req, res) => {
       ]
     );
     // Retrieve the inserted record:
-    const [rows] = await db.query('SELECT * FROM fun_events WHERE id = ?', [result.insertId]);
+    const [rows] = await db.getPool().query('SELECT * FROM fun_events WHERE id = ?', [result.insertId]);
     res.status(201).json(rows[0]);
   } catch (err) {
     console.error('Error creating fun event:', err);
