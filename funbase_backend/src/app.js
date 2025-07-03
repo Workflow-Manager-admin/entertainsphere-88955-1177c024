@@ -8,6 +8,9 @@ const cors = require('cors');
 
 const memeRoutes = require('./routes/memeRoutes');
 const userRoutes = require('./routes/userRoutes');
+// Suggestions and Favorites
+const suggestionRoutes = require('./routes/suggestionRoutes');
+const favoriteRoutes = require('./routes/favoriteRoutes');
 
 const app = express();
 
@@ -27,6 +30,11 @@ app.get('/', (req, res) => {
 
 app.use('/api/memes', memeRoutes);
 app.use('/api/users', userRoutes);
+
+// Movie/song suggestions endpoints
+app.use('/api/suggestions', suggestionRoutes);
+// Favorites endpoints
+app.use('/api/favorites', favoriteRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
