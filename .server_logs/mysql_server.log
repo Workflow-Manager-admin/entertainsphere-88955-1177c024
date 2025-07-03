@@ -1,0 +1,24 @@
+Starting MySQL setup...
+MySQL is already running!
+
+Database: myapp
+Root user: root (password: dbuser123)
+App user: appuser (password: dbuser123)
+Port: 5000
+
+To connect to the database, use:
+mysql -u appuser -pdbuser123 -h localhost -P 5000 myapp
+
+Script stopped - MySQL server already running.
+
+> simple-db-viewer@1.0.0 start
+> node server.js --host 0.0.0.0
+
+✓ mysql.env loaded (5 variables)
+Database viewer running on http://localhost:5001
+
+Environment variables expected:
+PostgreSQL: POSTGRES_URL, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_PORT
+MySQL: MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB, MYSQL_PORT
+SQLite: SQLITE_DB
+MongoDB: MONGODB_URL, MONGODB_DB
