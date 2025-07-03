@@ -1,6 +1,6 @@
 /**
  * FunBase Backend - Express.js entrypoint.
- * Provides REST API for memes (CRUD, like/save), feed, and user operations.
+ * Provides REST API for memes (CRUD, like/save), feed, user operations, quotes, and more.
  */
 require('dotenv').config();
 const express = require('express');
@@ -11,6 +11,7 @@ const userRoutes = require('./routes/userRoutes');
 // Suggestions and Favorites
 const suggestionRoutes = require('./routes/suggestionRoutes');
 const favoriteRoutes = require('./routes/favoriteRoutes');
+const quoteRoutes = require('./routes/quoteRoutes');
 
 const app = express();
 
@@ -28,8 +29,12 @@ app.get('/', (req, res) => {
   res.json({ status: 'ok', message: 'FunBase API is running 🎉' });
 });
 
+// Register resource routes
 app.use('/api/memes', memeRoutes);
 app.use('/api/users', userRoutes);
+
+// Quotes endpoints
+app.use('/api/quotes', quoteRoutes);
 
 // Movie/song suggestions endpoints
 app.use('/api/suggestions', suggestionRoutes);
