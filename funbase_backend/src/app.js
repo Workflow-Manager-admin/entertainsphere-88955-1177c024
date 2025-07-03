@@ -12,6 +12,7 @@ const userRoutes = require('./routes/userRoutes');
 const suggestionRoutes = require('./routes/suggestionRoutes');
 const favoriteRoutes = require('./routes/favoriteRoutes');
 const quoteRoutes = require('./routes/quoteRoutes');
+const funEventRoutes = require('./routes/funEventRoutes'); // <-- Added
 
 const app = express();
 
@@ -40,6 +41,9 @@ app.use('/api/quotes', quoteRoutes);
 app.use('/api/suggestions', suggestionRoutes);
 // Favorites endpoints
 app.use('/api/favorites', favoriteRoutes);
+
+// Add fun-events endpoints for "What Was Fun Today?/Fun Flashback"/Trending Fun Now (time-travel)
+app.use('/fun-events', funEventRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
