@@ -1,28 +1,15 @@
 Starting MySQL setup...
-Starting MySQL server...
-Waiting for MySQL to start...
-Waiting... (1/15)
-Waiting... (2/15)
-Waiting... (3/15)
-Waiting... (4/15)
-Waiting... (5/15)
-mysqld is alive
-MySQL is ready!
-Setting up database and fixing authentication...
-Connection command saved to db_connection.txt
-MySQL setup complete!
+MySQL is already running!
+
 Database: myapp
 Root user: root (password: dbuser123)
 App user: appuser (password: dbuser123)
 Port: 5000
 
-Environment variables saved to db_visualizer/mysql.env
-To use with Node.js viewer, run: source db_visualizer/mysql.env
-To connect to the database, use the following command:
+To connect to the database, use:
 mysql -u appuser -pdbuser123 -h localhost -P 5000 myapp
 
-MySQL is running in the background.
-You can now start your application.
+Script stopped - MySQL server already running.
 
 > simple-db-viewer@1.0.0 start
 > node server.js --host 0.0.0.0
